@@ -65,8 +65,9 @@ export function RequestsTable({ status, userId }: RequestsTableProps) {
     queryKey: ['/api/requests', status, userId],
   });
 
-  const paginatedRequests = requests.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-  const totalPages = Math.ceil(requests.length / pageSize);
+  const requestsArray = Array.isArray(requests) ? requests : [];
+  const paginatedRequests = requestsArray.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const totalPages = Math.ceil(requestsArray.length / pageSize);
 
   return (
     <div className="overflow-hidden rounded-lg shadow-sm border border-gray-100 backdrop-blur-md bg-card/85">
@@ -106,11 +107,11 @@ export function RequestsTable({ status, userId }: RequestsTableProps) {
               paginatedRequests.map((request: any) => (
                 <TableRow key={request.id} className="hover:bg-muted/50 transition-colors">
                   <TableCell className="font-medium">{request.requestCode}</TableCell>
-                  <TableCell className="text-muted-foreground">{request.partType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</TableCell>
+                  <TableCell className="text-muted-foreground">{request.partDescription}</TableCell>
                   <TableCell>
                     <div className="flex items-center">
-                      <ColorCircle colorHex={getColorHex(request.color)} className="mr-2" />
-                      <span>{request.color}</span>
+                      <ColorCircle colorHex={request.partColor ? getColorHex(request.partColor) : "#6b7280"} className="mr-2" />
+                      <span>{request.partColor || "Non specificato"}</span>
                     </div>
                   </TableCell>
                   <TableCell>{formatDate(request.createdAt)}</TableCell>
@@ -139,11 +140,11 @@ export function RequestsTable({ status, userId }: RequestsTableProps) {
         </Table>
       </div>
       
-      {requests.length > 0 && (
+      {requestsArray.length > 0 && (
         <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200">
           <div>
             <p className="text-sm text-muted-foreground">
-              Visualizzazione <span className="font-medium">{(currentPage - 1) * pageSize + 1}</span> - <span className="font-medium">{Math.min(currentPage * pageSize, requests.length)}</span> di <span className="font-medium">{requests.length}</span> risultati
+              Visualizzazione <span className="font-medium">{(currentPage - 1) * pageSize + 1}</span> - <span className="font-medium">{Math.min(currentPage * pageSize, requestsArray.length)}</span> di <span className="font-medium">{requestsArray.length}</span> risultati
             </p>
           </div>
           

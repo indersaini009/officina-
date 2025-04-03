@@ -210,7 +210,11 @@ export function RequestForm() {
                     <Textarea 
                       placeholder="Inserisci eventuali dettagli o richieste speciali" 
                       className="resize-none" 
-                      {...field} 
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      ref={field.ref}
                     />
                   </FormControl>
                   <FormMessage />
