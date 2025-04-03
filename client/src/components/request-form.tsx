@@ -99,14 +99,6 @@ export function RequestForm() {
     navigate("/");
   };
 
-  const onSaveAsDraft = () => {
-    // In a real implementation, we would save the form data as a draft
-    toast({
-      title: "Bozza salvata",
-      description: "La tua richiesta è stata salvata come bozza",
-    });
-  };
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -238,13 +230,6 @@ export function RequestForm() {
             onClick={onCancel}
           >
             Annulla
-          </Win11Button>
-          <Win11Button 
-            type="button" 
-            variant="outline" 
-            onClick={onSaveAsDraft}
-          >
-            Salva come Bozza
           </Win11Button>
           <Win11Button 
             type="submit" 

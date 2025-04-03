@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/tabs";
 
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState("recent");
+  const [activeTab, setActiveTab] = useState("active");
 
   return (
     <div className="container mx-auto">
@@ -30,16 +30,10 @@ export default function Dashboard() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
         <TabsList className="border-b border-gray-200 w-full justify-start rounded-none bg-transparent p-0">
           <TabsTrigger 
-            value="recent" 
+            value="active" 
             className="py-2 px-4 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none data-[state=active]:bg-transparent"
           >
-            Richieste Recenti
-          </TabsTrigger>
-          <TabsTrigger 
-            value="pending" 
-            className="py-2 px-4 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none data-[state=active]:bg-transparent"
-          >
-            Richieste da Approvare
+            Richieste Attive
           </TabsTrigger>
           <TabsTrigger 
             value="completed" 
@@ -49,12 +43,8 @@ export default function Dashboard() {
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="recent" className="mt-4">
-          <RequestsTable />
-        </TabsContent>
-        
-        <TabsContent value="pending" className="mt-4">
-          <RequestsTable status="pending" />
+        <TabsContent value="active" className="mt-4">
+          <RequestsTable status="active" />
         </TabsContent>
         
         <TabsContent value="completed" className="mt-4">

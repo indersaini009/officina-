@@ -82,6 +82,13 @@ export function RequestsTable({ status, userId }: RequestsTableProps) {
 
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ['/api/requests', status, userId],
+    select: (data) => {
+      // Se status è "active", filtra tutte le richieste diverse da "completed"
+      if (status === "active") {
+        return data.filter((req: any) => req.status !== "completed");
+      }
+      return data;
+    }
   });
 
   const updateStatusMutation = useMutation({
