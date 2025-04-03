@@ -40,6 +40,10 @@ function App() {
               <Route path="/reports" component={RequestHistory} />
               <Route component={NotFound} />
             </Switch>
+            
+            <footer className="mt-8 text-center text-sm text-gray-500 pb-4">
+              © 2025 Eurosystems Gestione Verniciatura - Tutti i diritti riservati
+            </footer>
           </main>
         </div>
       </div>
