@@ -100,6 +100,12 @@ export function StatusCards() {
             <div>
               <p className="text-sm text-muted-foreground">In corso</p>
               <h3 className="text-2xl font-bold mt-1">{processingRequests.length}</h3>
+              {processingRequests.map(req => req.plannedDate && (
+                <p key={req.id} className="text-xs text-orange-500 mt-1 flex items-center">
+                  <Clock className="h-3 w-3 mr-1" />
+                  <span>Pianificato per: {format(new Date(req.plannedDate), 'dd/MM/yyyy')}</span>
+                </p>
+              ))}
               {delayedRequests.length > 0 && (
                 <p className="text-xs text-orange-500 mt-1 flex items-center">
                   <Clock className="h-3 w-3 mr-1" />
