@@ -36,6 +36,7 @@ export const paintRequests = pgTable("paint_requests", {
   quantity: integer("quantity").notNull().default(1),
   priority: text("priority").notNull().default("normal"),
   notes: text("notes"),
+  plannedDate: timestamp("planned_date"),  // Data pianificata per la verniciatura
   status: text("status").notNull().default("pending"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),

@@ -325,6 +325,13 @@ export default function RequestDetails() {
                     <p className="font-medium">{formatDate(request.updatedAt)}</p>
                   </div>
                   
+                  {request.plannedDate && (
+                    <div>
+                      <p className="text-muted-foreground">Data Pianificata</p>
+                      <p className="font-medium">{formatDate(request.plannedDate)}</p>
+                    </div>
+                  )}
+                  
                   <div>
                     <p className="text-muted-foreground">Reparto Richiedente</p>
                     <p className="font-medium">{request.workstation}</p>

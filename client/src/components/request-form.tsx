@@ -6,6 +6,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { useEffect } from "react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 
 import { 
   Form, 
@@ -17,6 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+
 import { 
   Select, 
   SelectContent, 
@@ -41,6 +46,7 @@ const formSchema = insertPaintRequestSchema.extend({
   partColor: z.string().optional(),
   quantity: z.number().min(1, { message: "La quantità deve essere almeno 1" }),
   priority: z.string().min(1, { message: "Seleziona una priorità" }),
+  plannedDate: z.date().optional().nullable(),
 });
 
 export function RequestForm() {
@@ -59,6 +65,7 @@ export function RequestForm() {
       quantity: 1,
       priority: "normal",
       notes: "",
+      plannedDate: null,
     },
   });
   
@@ -196,6 +203,48 @@ export function RequestForm() {
                       ))}
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="plannedDate"
+              render={({ field }) => (
+                <FormItem className="mt-4">
+                  <FormLabel>Data Pianificata</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Win11Button
+                          variant={"outline"}
+                          type="button"
+                          className={`w-full pl-3 text-left font-normal ${
+                            !field.value && "text-muted-foreground"
+                          }`}
+                        >
+                          {field.value ? (
+                            format(field.value, "dd/MM/yyyy")
+                          ) : (
+                            <span>Seleziona una data</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Win11Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value || undefined}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date < new Date(new Date().setHours(0, 0, 0, 0))
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}

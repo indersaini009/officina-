@@ -108,7 +108,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
             </div>
           </div>
           <div className="px-4 py-2 text-xs text-gray-500">
-            <p>© 2023 Sistema Richieste Verniciatura</p>
+            <p>© 2025 Eurosystems Gestione Verniciatura</p>
             <p>Versione 1.0.5</p>
           </div>
         </div>
