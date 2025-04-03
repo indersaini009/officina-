@@ -74,11 +74,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPaintRequest(insertRequest: InsertPaintRequest): Promise<PaintRequest> {
-    // Generiamo un codice di richiesta basato su data e ora
+    // Generiamo un codice di richiesta basato su data, reparto e tipo ricambio
     const now = new Date();
-    const timestamp = now.getTime();
-    const random = Math.floor(Math.random() * 9000) + 1000; // Numero casuale a 4 cifre
-    const requestCode = `REQ-${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}-${random}`;
+    const workstation = insertRequest.workstation?.slice(0,3).toUpperCase() || 'EUR';
+    const partType = insertRequest.partType?.slice(0,2).toUpperCase() || 'PT';
+    const sequence = Math.floor(Math.random() * 900) + 100; // Numero casuale a 3 cifre
+    
+    // ES-MEC-25043-123 (Eurosystems, Reparto MEC, Data 25/04/3, Sequenza 123)
+    const requestCode = `ES-${workstation}-${now.getFullYear().toString().slice(2)}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}-${partType}${sequence}`;
     
     // Insert the request
     const [request] = await db
@@ -97,7 +100,7 @@ export class DatabaseStorage implements IStorage {
       await this.createNotification({
         userId: 1, // Notify default user (admin)
         requestId: request.id,
-        message: `Nuova richiesta ${requestCode} dalla postazione ${request.workstation}`,
+        message: `Nuova richiesta ${requestCode} dal reparto ${request.workstation}`,
         isRead: false,
         type: "info",
       });

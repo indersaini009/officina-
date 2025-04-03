@@ -32,6 +32,7 @@ export const paintRequests = pgTable("paint_requests", {
   workstation: text("workstation").notNull(),
   partDescription: text("part_description").notNull(),
   partCode: text("part_code").notNull(),
+  partType: text("part_type").default("ricambio"),  // Tipo di ricambio (meccanico, elettrico, ecc.)
   partColor: text("part_color"),  // Colore ricambio con descrizione libera
   quantity: integer("quantity").notNull().default(1),
   priority: text("priority").notNull().default("normal"),

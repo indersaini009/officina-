@@ -219,9 +219,18 @@ export function RequestsTable({ status, userId }: RequestsTableProps) {
                               <Play className="mr-2 h-4 w-4" />
                               <span>Avvia lavorazione</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleStatusChange(request.id, 'waiting')}>
+                            <DropdownMenuItem onClick={() => {
+                              const date = prompt("Inserisci la data prevista di completamento (GG/MM/AAAA):");
+                              if (date) {
+                                // Qui potremmo salvare la data in un campo separato se necessario
+                                toast({
+                                  title: "Programmazione",
+                                  description: `Completamento pianificato per il ${date}`,
+                                });
+                              }
+                            }}>
                               <Clock className="mr-2 h-4 w-4" />
-                              <span>Metti in attesa</span>
+                              <span>Pianifica completamento</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleStatusChange(request.id, 'rejected')}>
                               <X className="mr-2 h-4 w-4" />

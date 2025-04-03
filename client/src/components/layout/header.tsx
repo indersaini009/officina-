@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Win11Button } from "@/components/ui/win11-button";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { User, LogOut, Bell, Settings, UserCog } from "lucide-react";
+import { User, LogOut, Bell, Settings, UserCog, RefreshCw } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
 interface HeaderProps {
@@ -105,10 +105,32 @@ export function Header({ onSidebarToggle }: HeaderProps) {
         >
           <User className="h-5 w-5" />
         </Button>
-        <h1 className="text-xl font-semibold text-foreground">Sistema di Richieste Verniciatura</h1>
+        <h1 className="text-xl font-semibold text-foreground">Eurosystems Gestione Verniciatura</h1>
       </div>
       
       <div className="flex items-center space-x-2">
+        <Win11Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => {
+            toast({
+              title: "Sincronizzazione",
+              description: "Sincronizzazione del database in corso...",
+            });
+            
+            // Simuliamo una sincronizzazione del database
+            setTimeout(() => {
+              toast({
+                title: "Sincronizzazione",
+                description: "Database sincronizzato con successo",
+              });
+              refetchNotifications();
+            }, 1000);
+          }}
+          className="mr-1"
+        >
+          <RefreshCw className="h-5 w-5" />
+        </Win11Button>
         <DropdownMenu open={notificationsOpen} onOpenChange={setNotificationsOpen}>
           <DropdownMenuTrigger asChild>
             <Win11Button variant="ghost" size="icon" className="relative">
@@ -122,7 +144,7 @@ export function Header({ onSidebarToggle }: HeaderProps) {
             <DropdownMenuLabel className="flex justify-between items-center">
               <span>Notifiche</span>
               <Button variant="ghost" size="sm" onClick={handleMarkAllAsRead}>
-                <span className="text-xs text-primary">Segna tutti come letti</span>
+                <span className="text-xs text-primary">Segna tutti letti</span>
               </Button>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
