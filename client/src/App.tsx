@@ -10,6 +10,7 @@ import NewRequest from "@/pages/new-request";
 import ActiveRequests from "@/pages/active-requests";
 import RequestHistory from "@/pages/request-history";
 import RequestDetails from "@/pages/request-details";
+import Impostazioni from "@/pages/impostazioni";
 import NotFound from "@/pages/not-found";
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
               <Route path="/active-requests" component={ActiveRequests} />
               <Route path="/request-history" component={RequestHistory} />
               <Route path="/request/:id" component={RequestDetails} />
+              <Route path="/impostazioni" component={Impostazioni} />
               <Route path="/archive" component={RequestHistory} />
               <Route path="/reports" component={RequestHistory} />
               <Route component={NotFound} />

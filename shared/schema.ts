@@ -29,14 +29,14 @@ export const paintRequests = pgTable("paint_requests", {
   id: serial("id").primaryKey(),
   requestCode: text("request_code").notNull().unique(),
   userId: integer("user_id").notNull(),
-  workstation: text("workstation").notNull(), // Aggiunta della postazione
-  partDescription: text("part_description").notNull(), // Cambiato da partType a partDescription
+  workstation: text("workstation").notNull(),
+  partDescription: text("part_description").notNull(),
   partCode: text("part_code").notNull(),
+  partColor: text("part_color"),  // Colore ricambio con descrizione libera
   quantity: integer("quantity").notNull().default(1),
   priority: text("priority").notNull().default("normal"),
   notes: text("notes"),
   status: text("status").notNull().default("pending"),
-  imagePath: text("image_path"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
   completedAt: timestamp("completed_at"),

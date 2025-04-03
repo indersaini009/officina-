@@ -28,6 +28,7 @@ export function Sidebar({ collapsed }: SidebarProps) {
     { path: "/request-history", label: "Storico Richieste", icon: "History" },
     { path: "/archive", label: "Archivio", icon: "Archive" },
     { path: "/reports", label: "Report", icon: "FileBarChart" },
+    { path: "/impostazioni", label: "Impostazioni", icon: "Settings" },
   ];
 
   // Toggle dark mode class on the document element
