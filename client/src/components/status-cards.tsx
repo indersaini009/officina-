@@ -103,8 +103,7 @@ export function StatusCards() {
               {processingRequests.map(req => req.plannedDate && (
                 <p key={req.id} className="text-xs text-orange-500 mt-1 flex items-center">
                   <Clock className="h-3 w-3 mr-1" />
-                  <span>Pianificato per: {format(new Date(req.plannedDate), 'dd/MM/yyyy')}</span>
-                </p>
+                  </p>
               ))}
               {delayedRequests.length > 0 && (
                 <p className="text-xs text-orange-500 mt-1 flex items-center">
