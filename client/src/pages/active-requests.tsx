@@ -6,7 +6,7 @@ import { PriorityBadge } from "@/components/ui/priority-badge";
 import { ColorCircle } from "@/components/ui/color-circle";
 import { Progress } from "@/components/ui/progress";
 import { Win11Button } from "@/components/ui/win11-button";
-import { getColorHex, formatDate, formatPartType } from "@/lib/utils";
+import { getColorHex, formatDate } from "@/lib/utils";
 import { Link } from "wouter";
 import { Clock, Eye } from "lucide-react";
 
@@ -78,17 +78,17 @@ export default function ActiveRequests() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <p className="text-sm font-medium mb-1">Ricambio</p>
-                      <p className="text-muted-foreground">{formatPartType(request.partType)}</p>
+                      <p className="text-muted-foreground">{request.partDescription}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium mb-1">Modello</p>
-                      <p className="text-muted-foreground">{request.vehicleModel}</p>
+                      <p className="text-sm font-medium mb-1">Codice</p>
+                      <p className="text-muted-foreground">{request.partCode}</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium mb-1">Colore</p>
                       <div className="flex items-center">
-                        <ColorCircle colorHex={getColorHex(request.color)} className="mr-2" />
-                        <p className="text-muted-foreground">{request.color}</p>
+                        <ColorCircle colorHex={getColorHex(request.partColor || '')} className="mr-2" />
+                        <p className="text-muted-foreground">{request.partColor || 'Non specificato'}</p>
                       </div>
                     </div>
                   </div>

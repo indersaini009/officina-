@@ -22,7 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { getColorHex, formatDate, formatDateTime, formatPartType, getFinishTypeText } from "@/lib/utils";
+import { getColorHex, formatDate, formatDateTime, getFinishTypeText } from "@/lib/utils";
 import { ArrowLeft, Clock, Check, X, AlertTriangle, HistoryIcon } from "lucide-react";
 
 export default function RequestDetails() {

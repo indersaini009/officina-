@@ -74,14 +74,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPaintRequest(insertRequest: InsertPaintRequest): Promise<PaintRequest> {
-    // Generiamo un codice di richiesta basato su data, reparto e tipo ricambio
+    // Generiamo un codice di richiesta basato su data e reparto
     const now = new Date();
     const workstation = insertRequest.workstation?.slice(0,3).toUpperCase() || 'EUR';
-    const partType = insertRequest.partType?.slice(0,2).toUpperCase() || 'PT';
     const sequence = Math.floor(Math.random() * 900) + 100; // Numero casuale a 3 cifre
     
     // ES-MEC-25043-123 (Eurosystems, Reparto MEC, Data 25/04/3, Sequenza 123)
-    const requestCode = `ES-${workstation}-${now.getFullYear().toString().slice(2)}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}-${partType}${sequence}`;
+    const requestCode = `ES-${workstation}-${now.getFullYear().toString().slice(2)}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}-${sequence}`;
     
     // Insert the request
     const [request] = await db

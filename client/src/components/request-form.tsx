@@ -34,20 +34,10 @@ const priorities = [
   { value: "urgent", label: "Urgente" },
 ];
 
-const partTypes = [
-  { value: "meccanico", label: "Meccanico" },
-  { value: "elettrico", label: "Elettrico" },
-  { value: "elettronico", label: "Elettronico" },
-  { value: "idraulico", label: "Idraulico" },
-  { value: "pneumatico", label: "Pneumatico" },
-  { value: "altro", label: "Altro" },
-];
-
 // Extend the paint request schema with custom validation
 const formSchema = insertPaintRequestSchema.extend({
   partDescription: z.string().min(1, { message: "Inserisci una descrizione del ricambio" }),
   partCode: z.string().min(1, { message: "Inserisci il codice del ricambio" }),
-  partType: z.string().min(1, { message: "Seleziona il tipo di ricambio" }),
   partColor: z.string().optional(),
   quantity: z.number().min(1, { message: "La quantità deve essere almeno 1" }),
   priority: z.string().min(1, { message: "Seleziona una priorità" }),
@@ -65,7 +55,6 @@ export function RequestForm() {
       workstation: localStorage.getItem('workstation') || "Postazione 1",
       partDescription: "",
       partCode: "",
-      partType: "meccanico",
       partColor: "",
       quantity: 1,
       priority: "normal",
@@ -147,33 +136,7 @@ export function RequestForm() {
               )}
             />
             
-            <FormField
-              control={form.control}
-              name="partType"
-              render={({ field }) => (
-                <FormItem className="mt-4">
-                  <FormLabel>Tipo Ricambio</FormLabel>
-                  <Select 
-                    onValueChange={field.onChange} 
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Seleziona tipo ricambio" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {partTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {type.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
             
             <FormField
               control={form.control}

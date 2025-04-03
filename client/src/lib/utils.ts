@@ -57,8 +57,4 @@ export function getFinishTypeText(finishType: string): string {
   return finishTypes[finishType] || finishType;
 }
 
-// Format part type to readable text
-export function formatPartType(partType?: string): string {
-  if (!partType) return '';
-  return partType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-}
+
