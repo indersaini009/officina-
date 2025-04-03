@@ -74,14 +74,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPaintRequest(insertRequest: InsertPaintRequest): Promise<PaintRequest> {
-    // Get the next ID to create the request code
-    const [maxIdResult] = await db
-      .select({ maxId: db.fn.max(paintRequests.id).as("maxId") })
-      .from(paintRequests);
-    
-    const nextId = (maxIdResult?.maxId || 0) + 1;
+    // Generiamo un codice di richiesta basato su data e ora
     const now = new Date();
-    const requestCode = `REQ-${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${nextId.toString().padStart(4, '0')}`;
+    const timestamp = now.getTime();
+    const random = Math.floor(Math.random() * 9000) + 1000; // Numero casuale a 4 cifre
+    const requestCode = `REQ-${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}-${random}`;
     
     // Insert the request
     const [request] = await db
@@ -95,14 +92,19 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     
-    // Create a notification for the new request
-    await this.createNotification({
-      userId: 1, // Notify default user (admin)
-      requestId: request.id,
-      message: `Nuova richiesta ${requestCode} dalla postazione ${request.workstation}`,
-      isRead: false,
-      type: "info",
-    });
+    try {
+      // Create a notification for the new request
+      await this.createNotification({
+        userId: 1, // Notify default user (admin)
+        requestId: request.id,
+        message: `Nuova richiesta ${requestCode} dalla postazione ${request.workstation}`,
+        isRead: false,
+        type: "info",
+      });
+    } catch (error) {
+      console.error("Errore nella creazione della notifica:", error);
+      // Continuiamo comunque, la richiesta è stata creata
+    }
     
     return request;
   }
