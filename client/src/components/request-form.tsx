@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
+import { useEffect } from "react";
 
 import { 
   Form, 
@@ -60,6 +61,12 @@ export function RequestForm() {
       notes: "",
     },
   });
+  
+  // Aggiorna il valore della postazione quando cambia nel localStorage
+  useEffect(() => {
+    const workstation = localStorage.getItem('workstation') || "Postazione 1";
+    form.setValue('workstation', workstation);
+  }, [form]);
 
   const createRequestMutation = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
