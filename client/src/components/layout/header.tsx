@@ -156,16 +156,16 @@ export function Header({ onSidebarToggle }: HeaderProps) {
           <DropdownMenuTrigger asChild>
             <Win11Button variant="ghost" className="flex items-center space-x-2">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={`https://ui-avatars.com/api/?name=${user?.fullName || 'User'}&background=0D8ABC&color=fff`} />
-                <AvatarFallback>MR</AvatarFallback>
+                <AvatarImage src={`https://ui-avatars.com/api/?name=${localStorage.getItem('workstation') || 'Reparto'}&background=0D8ABC&color=fff`} />
+                <AvatarFallback>{(localStorage.getItem('workstation') || 'R')[0].toUpperCase()}</AvatarFallback>
               </Avatar>
-              <span className="font-medium text-sm hidden md:inline">{user?.fullName || 'Mario Rossi'}</span>
+              <span className="font-medium text-sm hidden md:inline">{localStorage.getItem('workstation') || 'Reparto'}</span>
             </Win11Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>
-              <p className="font-medium text-sm">{user?.fullName || 'Mario Rossi'}</p>
-              <p className="text-xs text-gray-500">{user?.email || 'mario.rossi@azienda.it'}</p>
+              <p className="font-medium text-sm">{localStorage.getItem('workstation') || 'Reparto'}</p>
+              <p className="text-xs text-gray-500">Reparto richiedente</p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>

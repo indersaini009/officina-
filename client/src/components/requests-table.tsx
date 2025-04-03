@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
   Table, 
   TableBody, 
@@ -18,12 +18,29 @@ import {
   PaginationNext, 
   PaginationPrevious 
 } from "@/components/ui/pagination";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ColorCircle } from "@/components/ui/color-circle";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { PriorityBadge } from "@/components/ui/priority-badge";
-import { Eye, MoreHorizontal } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { 
+  Eye, 
+  MoreHorizontal, 
+  Play, 
+  Clock, 
+  X, 
+  CheckCircle 
+} from "lucide-react";
 
 interface RequestsTableProps {
   status?: string;
@@ -60,10 +77,54 @@ const formatDate = (dateString: string) => {
 export function RequestsTable({ status, userId }: RequestsTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ['/api/requests', status, userId],
   });
+
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ id, status, rejectionReason }: { id: number, status: string, rejectionReason?: string }) => {
+      const response = await apiRequest("PATCH", `/api/requests/${id}/status`, {
+        status,
+        rejectionReason,
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalida le cache per aggiornare tutte le viste
+      queryClient.invalidateQueries({ queryKey: ['/api/requests'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/notifications'] });
+      
+      toast({
+        title: "Stato aggiornato",
+        description: "Lo stato della richiesta è stato aggiornato con successo",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Errore",
+        description: `Non è stato possibile aggiornare lo stato: ${error}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleStatusChange = (id: number, newStatus: string) => {
+    if (newStatus === 'rejected') {
+      const reason = prompt("Inserisci il motivo del rifiuto:");
+      if (reason === null) return; // L'utente ha annullato
+      
+      updateStatusMutation.mutate({ 
+        id, 
+        status: newStatus, 
+        rejectionReason: reason || "Nessun motivo specificato" 
+      });
+    } else {
+      updateStatusMutation.mutate({ id, status: newStatus });
+    }
+  };
 
   const requestsArray = Array.isArray(requests) ? requests : [];
   const paginatedRequests = requestsArray.slice((currentPage - 1) * pageSize, currentPage * pageSize);
@@ -128,10 +189,49 @@ export function RequestsTable({ status, userId }: RequestsTableProps) {
                         <span className="sr-only">Visualizza</span>
                       </Button>
                     </Link>
-                    <Button variant="ghost" size="sm" className="text-muted-foreground h-8 w-8 p-0">
-                      <MoreHorizontal className="h-4 w-4" />
-                      <span className="sr-only">Altro</span>
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="text-muted-foreground h-8 w-8 p-0">
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">Altro</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Azioni</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        
+                        {request.status === 'pending' && (
+                          <>
+                            <DropdownMenuItem onClick={() => handleStatusChange(request.id, 'processing')}>
+                              <Play className="mr-2 h-4 w-4" />
+                              <span>Avvia lavorazione</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleStatusChange(request.id, 'waiting')}>
+                              <Clock className="mr-2 h-4 w-4" />
+                              <span>Metti in attesa</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleStatusChange(request.id, 'rejected')}>
+                              <X className="mr-2 h-4 w-4" />
+                              <span>Rifiuta</span>
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                        
+                        {request.status === 'processing' && (
+                          <DropdownMenuItem onClick={() => handleStatusChange(request.id, 'completed')}>
+                            <CheckCircle className="mr-2 h-4 w-4" />
+                            <span>Completa</span>
+                          </DropdownMenuItem>
+                        )}
+                        
+                        {request.status === 'waiting' && (
+                          <DropdownMenuItem onClick={() => handleStatusChange(request.id, 'processing')}>
+                            <Play className="mr-2 h-4 w-4" />
+                            <span>Avvia lavorazione</span>
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))
