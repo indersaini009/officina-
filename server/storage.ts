@@ -24,102 +24,82 @@ export interface IStorage {
   markAllNotificationsAsRead(userId: number): Promise<boolean>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private paintRequests: Map<number, PaintRequest>;
-  private notifications: Map<number, Notification>;
-  private userIdCounter: number;
-  private requestIdCounter: number;
-  private notificationIdCounter: number;
+import { db } from "./db";
+import { eq, and, desc } from "drizzle-orm";
 
-  constructor() {
-    this.users = new Map();
-    this.paintRequests = new Map();
-    this.notifications = new Map();
-    this.userIdCounter = 1;
-    this.requestIdCounter = 1;
-    this.notificationIdCounter = 1;
-    
-    // Create a default user
-    this.createUser({
-      username: "mario.rossi",
-      password: "password123", // In a real app, this would be hashed
-      fullName: "Mario Rossi",
-      email: "mario.rossi@azienda.it",
-      department: "engineering"
-    });
-  }
-
+export class DatabaseStorage implements IStorage {
   // User methods
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.userIdCounter++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
   // Paint Request methods
   async getPaintRequest(id: number): Promise<PaintRequest | undefined> {
-    return this.paintRequests.get(id);
+    const [request] = await db.select().from(paintRequests).where(eq(paintRequests.id, id));
+    return request || undefined;
   }
 
   async getPaintRequestByCode(requestCode: string): Promise<PaintRequest | undefined> {
-    return Array.from(this.paintRequests.values()).find(
-      (request) => request.requestCode === requestCode,
-    );
+    const [request] = await db.select().from(paintRequests).where(eq(paintRequests.requestCode, requestCode));
+    return request || undefined;
   }
 
   async listPaintRequests(userId?: number, status?: string): Promise<PaintRequest[]> {
-    const requests = Array.from(this.paintRequests.values());
+    let query = db.select().from(paintRequests);
     
-    return requests.filter(request => {
-      if (userId !== undefined && request.userId !== userId) {
-        return false;
-      }
-      if (status !== undefined && request.status !== status) {
-        return false;
-      }
-      return true;
-    })
-    .sort((a, b) => {
-      // Sort by creation date (newest first)
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
+    // Add filters if provided
+    if (userId !== undefined && status !== undefined) {
+      query = query.where(and(eq(paintRequests.userId, userId), eq(paintRequests.status, status)));
+    } else if (userId !== undefined) {
+      query = query.where(eq(paintRequests.userId, userId));
+    } else if (status !== undefined) {
+      query = query.where(eq(paintRequests.status, status));
+    }
+    
+    // Order by createdAt descending
+    query = query.orderBy(desc(paintRequests.createdAt));
+    
+    return await query;
   }
 
   async createPaintRequest(insertRequest: InsertPaintRequest): Promise<PaintRequest> {
-    const id = this.requestIdCounter++;
+    // Get the next ID to create the request code
+    const [maxIdResult] = await db
+      .select({ maxId: db.fn.max(paintRequests.id).as("maxId") })
+      .from(paintRequests);
+    
+    const nextId = (maxIdResult?.maxId || 0) + 1;
     const now = new Date();
-    const requestCode = `REQ-${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${id.toString().padStart(4, '0')}`;
+    const requestCode = `REQ-${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${nextId.toString().padStart(4, '0')}`;
     
-    const request: PaintRequest = {
-      ...insertRequest,
-      id,
-      requestCode,
-      status: "pending",
-      createdAt: now,
-      updatedAt: now,
-      completedAt: null,
-      rejectionReason: null,
-    };
-    
-    this.paintRequests.set(id, request);
+    // Insert the request
+    const [request] = await db
+      .insert(paintRequests)
+      .values({
+        ...insertRequest,
+        requestCode,
+        status: "pending",
+        createdAt: now,
+        updatedAt: now
+      })
+      .returning();
     
     // Create a notification for the new request
     await this.createNotification({
-      userId: request.userId,
-      requestId: id,
-      message: `Richiesta ${requestCode} creata con successo`,
+      userId: 1, // Notify default user (admin)
+      requestId: request.id,
+      message: `Nuova richiesta ${requestCode} dalla postazione ${request.workstation}`,
       isRead: false,
       type: "info",
     });
@@ -128,27 +108,37 @@ export class MemStorage implements IStorage {
   }
 
   async updatePaintRequestStatus(id: number, status: string, details?: { rejectionReason?: string }): Promise<PaintRequest | undefined> {
-    const request = this.paintRequests.get(id);
-    if (!request) {
+    // Get the current request
+    const [existingRequest] = await db
+      .select()
+      .from(paintRequests)
+      .where(eq(paintRequests.id, id));
+    
+    if (!existingRequest) {
       return undefined;
     }
-
-    const updatedRequest: PaintRequest = {
-      ...request,
+    
+    const now = new Date();
+    const updateData: any = {
       status,
-      updatedAt: new Date(),
+      updatedAt: now
     };
-
+    
     if (status === "completed") {
-      updatedRequest.completedAt = new Date();
+      updateData.completedAt = now;
     }
-
+    
     if (status === "rejected" && details?.rejectionReason) {
-      updatedRequest.rejectionReason = details.rejectionReason;
+      updateData.rejectionReason = details.rejectionReason;
     }
-
-    this.paintRequests.set(id, updatedRequest);
-
+    
+    // Update the request
+    const [updatedRequest] = await db
+      .update(paintRequests)
+      .set(updateData)
+      .where(eq(paintRequests.id, id))
+      .returning();
+    
     // Create a notification for the status change
     let notificationType: string;
     let notificationMessage: string;
@@ -156,77 +146,74 @@ export class MemStorage implements IStorage {
     switch (status) {
       case "processing":
         notificationType = "info";
-        notificationMessage = `Richiesta ${request.requestCode} è ora in lavorazione`;
+        notificationMessage = `Richiesta ${updatedRequest.requestCode} è ora in lavorazione`;
         break;
       case "completed":
         notificationType = "success";
-        notificationMessage = `Richiesta ${request.requestCode} è stata completata`;
+        notificationMessage = `Richiesta ${updatedRequest.requestCode} è stata completata`;
         break;
       case "rejected":
         notificationType = "error";
-        notificationMessage = `Richiesta ${request.requestCode} è stata rifiutata: ${details?.rejectionReason || 'Nessun motivo specificato'}`;
+        notificationMessage = `Richiesta ${updatedRequest.requestCode} è stata rifiutata: ${details?.rejectionReason || 'Nessun motivo specificato'}`;
         break;
       case "waiting":
         notificationType = "warning";
-        notificationMessage = `Richiesta ${request.requestCode} è in attesa`;
+        notificationMessage = `Richiesta ${updatedRequest.requestCode} è in attesa`;
         break;
       default:
         notificationType = "info";
-        notificationMessage = `Richiesta ${request.requestCode} è stata aggiornata`;
+        notificationMessage = `Richiesta ${updatedRequest.requestCode} è stata aggiornata`;
     }
-
+    
     await this.createNotification({
-      userId: request.userId,
+      userId: updatedRequest.userId,
       requestId: id,
       message: notificationMessage,
       isRead: false,
       type: notificationType,
     });
-
+    
     return updatedRequest;
   }
 
   // Notification methods
   async getNotifications(userId: number): Promise<Notification[]> {
-    return Array.from(this.notifications.values())
-      .filter(notification => notification.userId === userId)
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.userId, userId))
+      .orderBy(desc(notifications.createdAt));
   }
 
   async createNotification(insertNotification: InsertNotification): Promise<Notification> {
-    const id = this.notificationIdCounter++;
-    const notification: Notification = {
-      ...insertNotification,
-      id,
-      createdAt: new Date(),
-    };
+    const [notification] = await db
+      .insert(notifications)
+      .values({
+        ...insertNotification,
+        createdAt: new Date()
+      })
+      .returning();
     
-    this.notifications.set(id, notification);
     return notification;
   }
 
   async markNotificationAsRead(id: number): Promise<boolean> {
-    const notification = this.notifications.get(id);
-    if (!notification) {
-      return false;
-    }
-
-    notification.isRead = true;
-    this.notifications.set(id, notification);
-    return true;
+    const result = await db
+      .update(notifications)
+      .set({ isRead: true })
+      .where(eq(notifications.id, id));
+    
+    return true; // In PostgreSQL we don't get a count easily, so assume success
   }
 
   async markAllNotificationsAsRead(userId: number): Promise<boolean> {
-    const userNotifications = Array.from(this.notifications.values())
-      .filter(notification => notification.userId === userId);
+    await db
+      .update(notifications)
+      .set({ isRead: true })
+      .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)));
     
-    for (const notification of userNotifications) {
-      notification.isRead = true;
-      this.notifications.set(notification.id, notification);
-    }
-    
-    return true;
+    return true; // In PostgreSQL we don't get a count easily, so assume success
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

@@ -25,30 +25,18 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Win11Button } from "@/components/ui/win11-button";
-import { ColorPicker } from "@/components/color-picker";
 import { insertPaintRequestSchema } from "@shared/schema";
 
-const partTypes = [
-  { value: "paraurti_anteriore", label: "Paraurti Anteriore" },
-  { value: "paraurti_posteriore", label: "Paraurti Posteriore" },
-  { value: "portiera_anteriore_sx", label: "Portiera Anteriore SX" },
-  { value: "portiera_anteriore_dx", label: "Portiera Anteriore DX" },
-  { value: "portiera_posteriore_sx", label: "Portiera Posteriore SX" },
-  { value: "portiera_posteriore_dx", label: "Portiera Posteriore DX" },
-  { value: "cofano", label: "Cofano Motore" },
-  { value: "parafango_ant_sx", label: "Parafango Anteriore SX" },
-  { value: "parafango_ant_dx", label: "Parafango Anteriore DX" },
-  { value: "specchietto_sx", label: "Specchietto Laterale SX" },
-  { value: "specchietto_dx", label: "Specchietto Laterale DX" },
-  { value: "altro", label: "Altro (specificare)" },
-];
-
-const finishTypes = [
-  { value: "glossy", label: "Lucida" },
-  { value: "matte", label: "Opaca" },
-  { value: "metallic", label: "Metallizzata" },
-  { value: "pearl", label: "Perlata" },
-  { value: "satin", label: "Satinata" },
+// Lista predefinita di postazioni di lavoro
+const workstations = [
+  { value: "postazione_1", label: "Postazione 1" },
+  { value: "postazione_2", label: "Postazione 2" },
+  { value: "postazione_3", label: "Postazione 3" },
+  { value: "postazione_4", label: "Postazione 4" },
+  { value: "postazione_5", label: "Postazione 5" },
+  { value: "postazione_magazzino", label: "Magazzino" },
+  { value: "postazione_ufficio", label: "Ufficio Tecnico" },
+  { value: "altro", label: "Altra Postazione" },
 ];
 
 const priorities = [
@@ -60,11 +48,9 @@ const priorities = [
 
 // Extend the paint request schema with custom validation
 const formSchema = insertPaintRequestSchema.extend({
-  partType: z.string().min(1, { message: "Seleziona un tipo di ricambio" }),
+  workstation: z.string().min(1, { message: "Seleziona la postazione" }),
+  partDescription: z.string().min(1, { message: "Inserisci una descrizione del ricambio" }),
   partCode: z.string().min(1, { message: "Inserisci il codice del ricambio" }),
-  vehicleModel: z.string().min(1, { message: "Inserisci il modello del veicolo" }),
-  color: z.string().min(1, { message: "Seleziona un colore" }),
-  finishType: z.string().min(1, { message: "Seleziona un tipo di finitura" }),
   quantity: z.number().min(1, { message: "La quantità deve essere almeno 1" }),
   priority: z.string().min(1, { message: "Seleziona una priorità" }),
 });
@@ -73,19 +59,15 @@ export function RequestForm() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, navigate] = useLocation();
-  const [selectedColorName, setSelectedColorName] = useState("Blu");
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       userId: 1, // In a real app, this would be the current authenticated user's ID
-      partType: "",
+      workstation: "",
+      partDescription: "",
       partCode: "",
-      vehicleModel: "",
-      color: "Blu",
-      colorCode: "",
-      finishType: "glossy",
       quantity: 1,
       priority: "normal",
       notes: "",
@@ -121,15 +103,6 @@ export function RequestForm() {
     createRequestMutation.mutate(values);
   };
 
-  const handleColorChange = (color: { name: string; hex: string }) => {
-    setSelectedColorName(color.name);
-    form.setValue("color", color.name);
-  };
-
-  const handleColorCodeChange = (colorCode: string) => {
-    form.setValue("colorCode", colorCode);
-  };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
@@ -157,27 +130,45 @@ export function RequestForm() {
           <div>
             <FormField
               control={form.control}
-              name="partType"
+              name="workstation"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tipo Ricambio</FormLabel>
+                  <FormLabel>Postazione</FormLabel>
                   <Select 
                     onValueChange={field.onChange} 
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Seleziona tipo ricambio" />
+                        <SelectValue placeholder="Seleziona postazione" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {partTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {type.label}
+                      {workstations.map((station) => (
+                        <SelectItem key={station.value} value={station.value}>
+                          {station.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="partDescription"
+              render={({ field }) => (
+                <FormItem className="mt-4">
+                  <FormLabel>Descrizione Ricambio</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Descrivi il ricambio richiesto..." 
+                      className="resize-none"
+                      {...field} 
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -196,26 +187,14 @@ export function RequestForm() {
                 </FormItem>
               )}
             />
-            
-            <FormField
-              control={form.control}
-              name="vehicleModel"
-              render={({ field }) => (
-                <FormItem className="mt-4">
-                  <FormLabel>Modello Veicolo</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Es. Sedan Model Y" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
+          </div>
+          
+          <div>
             <FormField
               control={form.control}
               name="quantity"
               render={({ field }) => (
-                <FormItem className="mt-4">
+                <FormItem>
                   <FormLabel>Quantità</FormLabel>
                   <FormControl>
                     <Input 
@@ -257,54 +236,6 @@ export function RequestForm() {
                 </FormItem>
               )}
             />
-          </div>
-          
-          <div>
-            <FormField
-              control={form.control}
-              name="color"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormControl>
-                    <ColorPicker 
-                      onColorChange={handleColorChange}
-                      defaultColor={{ name: field.value, hex: "#2563eb" }}
-                      onColorCodeChange={handleColorCodeChange}
-                      defaultColorCode={form.getValues("colorCode")}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="finishType"
-              render={({ field }) => (
-                <FormItem className="mt-4">
-                  <FormLabel>Tipo di Finitura</FormLabel>
-                  <Select 
-                    onValueChange={field.onChange} 
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Seleziona finitura" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {finishTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {type.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             
             <FormField
               control={form.control}
@@ -326,7 +257,7 @@ export function RequestForm() {
             
             <div className="mt-4">
               <FormLabel className="block mb-1">
-                Carica Riferimento Colore (opzionale)
+                Carica Immagine Riferimento (opzionale)
               </FormLabel>
               <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
                 <div className="space-y-1 text-center">

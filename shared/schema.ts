@@ -24,18 +24,14 @@ export type User = typeof users.$inferSelect;
 
 // Status enum: "pending" | "processing" | "completed" | "rejected" | "waiting"
 // Priority enum: "normal" | "medium" | "high" | "urgent"
-// Finish type: "glossy" | "matte" | "metallic" | "pearl" | "satin"
 
 export const paintRequests = pgTable("paint_requests", {
   id: serial("id").primaryKey(),
   requestCode: text("request_code").notNull().unique(),
   userId: integer("user_id").notNull(),
-  partType: text("part_type").notNull(),
+  workstation: text("workstation").notNull(), // Aggiunta della postazione
+  partDescription: text("part_description").notNull(), // Cambiato da partType a partDescription
   partCode: text("part_code").notNull(),
-  vehicleModel: text("vehicle_model").notNull(),
-  color: text("color").notNull(),
-  colorCode: text("color_code"),
-  finishType: text("finish_type").notNull(),
   quantity: integer("quantity").notNull().default(1),
   priority: text("priority").notNull().default("normal"),
   notes: text("notes"),
