@@ -39,7 +39,7 @@ export default function Dashboard() {
             value="completed" 
             className="py-2 px-4 data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:shadow-none rounded-none data-[state=active]:bg-transparent"
           >
-            Completate Recentemente
+            Richieste Completate Recenti
           </TabsTrigger>
         </TabsList>
         
@@ -48,7 +48,7 @@ export default function Dashboard() {
         </TabsContent>
         
         <TabsContent value="completed" className="mt-4">
-          <RequestsTable status="completed" />
+          <RequestsTable status="completed-only" />
         </TabsContent>
       </Tabs>
     </div>

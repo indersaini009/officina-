@@ -25,8 +25,8 @@ export default function RequestHistory() {
   return (
     <div className="container mx-auto">
       <PageHeader 
-        title="Storico Richieste" 
-        subtitle="Visualizza e cerca le richieste passate"
+        title="Storico Richieste Completate" 
+        subtitle="Visualizza e cerca le richieste completate"
         action={{ 
           label: "Esporta Report", 
           href: "#",
@@ -101,7 +101,7 @@ export default function RequestHistory() {
         </CardContent>
       </Win11Card>
       
-      <RequestsTable />
+      <RequestsTable status="completed-only" />
     </div>
   );
 }

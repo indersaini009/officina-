@@ -13,9 +13,7 @@ import { Clock, Eye } from "lucide-react";
 export default function ActiveRequests() {
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ['/api/requests'],
-    select: (data) => data.filter((req: any) => 
-      req.status === 'processing' || req.status === 'waiting'
-    ),
+    select: (data) => data.filter((req: any) => req.status !== 'completed'),
   });
 
   const getProgressValue = (status: string, createdDate: string) => {
@@ -35,8 +33,8 @@ export default function ActiveRequests() {
   return (
     <div className="container mx-auto">
       <PageHeader 
-        title="Richieste in Corso" 
-        subtitle="Monitora lo stato delle richieste di verniciatura attive"
+        title="Richieste Attive" 
+        subtitle="Monitora lo stato di tutte le richieste di verniciatura non completate"
       />
       
       <div className="grid grid-cols-1 gap-4">

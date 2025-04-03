@@ -23,11 +23,8 @@ export function Sidebar({ collapsed }: SidebarProps) {
 
   const links: SidebarLink[] = [
     { path: "/", label: "Dashboard", icon: "LayoutDashboard" },
-    { path: "/new-request", label: "Nuova Richiesta", icon: "PlusCircle" },
-    { path: "/active-requests", label: "Richieste in Corso", icon: "Clock" },
+    { path: "/active-requests", label: "Richieste Attive", icon: "Clock" },
     { path: "/request-history", label: "Storico Richieste", icon: "History" },
-    { path: "/archive", label: "Archivio", icon: "Archive" },
-    { path: "/reports", label: "Report", icon: "FileBarChart" },
     { path: "/impostazioni", label: "Impostazioni", icon: "Settings" },
   ];
 
