@@ -141,18 +141,13 @@ export default function RequestDetails() {
                   
                   <div className="space-y-3">
                     <div>
-                      <p className="text-sm text-muted-foreground">Tipo Ricambio</p>
-                      <p className="font-medium">{formatPartType(request.partType)}</p>
+                      <p className="text-sm text-muted-foreground">Descrizione Ricambio</p>
+                      <p className="font-medium">{request.partDescription}</p>
                     </div>
                     
                     <div>
                       <p className="text-sm text-muted-foreground">Codice Ricambio</p>
                       <p className="font-medium">{request.partCode}</p>
-                    </div>
-                    
-                    <div>
-                      <p className="text-sm text-muted-foreground">Modello Veicolo</p>
-                      <p className="font-medium">{request.vehicleModel}</p>
                     </div>
                     
                     <div>
@@ -167,27 +162,15 @@ export default function RequestDetails() {
                   
                   <div className="space-y-3">
                     <div>
-                      <p className="text-sm text-muted-foreground">Colore</p>
+                      <p className="text-sm text-muted-foreground">Colore Ricambio</p>
                       <div className="flex items-center">
                         <ColorCircle 
-                          colorHex={getColorHex(request.color)} 
+                          colorHex={request.partColor ? getColorHex(request.partColor) : "#6b7280"} 
                           size="md" 
                           className="mr-2" 
                         />
-                        <p className="font-medium">{request.color}</p>
+                        <p className="font-medium">{request.partColor || "Non specificato"}</p>
                       </div>
-                    </div>
-                    
-                    {request.colorCode && (
-                      <div>
-                        <p className="text-sm text-muted-foreground">Codice Colore</p>
-                        <p className="font-medium">{request.colorCode}</p>
-                      </div>
-                    )}
-                    
-                    <div>
-                      <p className="text-sm text-muted-foreground">Tipo di Finitura</p>
-                      <p className="font-medium">{getFinishTypeText(request.finishType)}</p>
                     </div>
                     
                     {request.notes && (
@@ -343,13 +326,8 @@ export default function RequestDetails() {
                   </div>
                   
                   <div>
-                    <p className="text-muted-foreground">Richiedente</p>
-                    <p className="font-medium">Mario Rossi</p>
-                  </div>
-                  
-                  <div>
-                    <p className="text-muted-foreground">Reparto</p>
-                    <p className="font-medium">Ingegneria</p>
+                    <p className="text-muted-foreground">Reparto Richiedente</p>
+                    <p className="font-medium">{request.workstation}</p>
                   </div>
                 </div>
               </div>

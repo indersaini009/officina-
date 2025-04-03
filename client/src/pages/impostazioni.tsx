@@ -78,18 +78,18 @@ export default function Impostazioni() {
       <div className="grid grid-cols-1 gap-6 mt-6 lg:grid-cols-2">
         <Win11Card>
           <CardHeader>
-            <CardTitle>Configurazione Postazione</CardTitle>
+            <CardTitle>Configurazione Reparto Richiedente</CardTitle>
             <CardDescription>
-              Imposta il nome della postazione di lavoro che verrà utilizzato nelle richieste
+              Imposta il nome del reparto richiedente che verrà utilizzato nelle richieste
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="workstation">Nome Postazione</Label>
+                <Label htmlFor="workstation">Nome Reparto Richiedente</Label>
                 <Input
                   id="workstation"
-                  placeholder="Es. Postazione 1"
+                  placeholder="Es. Assistenza Tecnica"
                   value={workstation}
                   onChange={(e) => setWorkstation(e.target.value)}
                 />
@@ -168,16 +168,16 @@ export default function Impostazioni() {
         <CardContent>
           <div className="space-y-4">
             <p>
-              Per condividere il database tra più postazioni, è possibile utilizzare un file di database condiviso sulla rete locale.
-              Questo permette a tutte le postazioni di accedere agli stessi dati senza necessità di un server dedicato.
+              Per condividere il database tra più reparti, è possibile utilizzare un file di database condiviso sulla rete locale.
+              Questo permette a tutti i reparti di accedere agli stessi dati senza necessità di un server dedicato.
             </p>
             
             <Separator />
             
             <h3 className="text-lg font-medium">Istruzioni di configurazione:</h3>
             <ol className="list-decimal list-inside space-y-2">
-              <li>Creare una cartella condivisa sulla rete accessibile a tutte le postazioni</li>
-              <li>Assicurarsi che tutte le postazioni abbiano i permessi di lettura e scrittura sulla cartella</li>
+              <li>Creare una cartella condivisa sulla rete accessibile a tutti i reparti</li>
+              <li>Assicurarsi che tutti i computer abbiano i permessi di lettura e scrittura sulla cartella</li>
               <li>Inserire il percorso completo della cartella condivisa nelle impostazioni</li>
               <li>Salvare le impostazioni e riavviare l'applicazione</li>
               <li>Se il database non esiste già, verrà creato automaticamente al primo avvio</li>
