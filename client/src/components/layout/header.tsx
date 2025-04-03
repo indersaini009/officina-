@@ -140,37 +140,43 @@ export function Header({ onSidebarToggle }: HeaderProps) {
               )}
             </Win11Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80 max-h-[70vh] overflow-auto">
+          <DropdownMenuContent align="end" className="w-96 max-h-[70vh] overflow-auto">
             <DropdownMenuLabel className="flex justify-between items-center">
-              <span>Notifiche</span>
+              <span className="text-base font-semibold">Notifiche</span>
               <Button variant="ghost" size="sm" onClick={handleMarkAllAsRead}>
-                <span className="text-xs text-primary">Segna tutti letti</span>
+                <span className="text-xs text-primary font-medium">Segna tutti come letti</span>
               </Button>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             {notifications.length === 0 ? (
-              <div className="p-4 text-center text-sm text-muted-foreground">
-                Nessuna notifica
+              <div className="p-6 text-center">
+                <Bell className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-25" />
+                <p className="text-sm text-muted-foreground">Nessuna notifica</p>
               </div>
             ) : (
               notifications.map((notification: any) => (
-                <DropdownMenuItem 
-                  key={notification.id} 
-                  className="p-3 cursor-pointer flex items-start"
-                  onClick={() => handleMarkAsRead(notification.id)}
-                >
-                  <div className={`h-2 w-2 mt-1.5 ${getNotificationTypeIcon(notification.type)} rounded-full mr-2`} />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{notification.message}</p>
-                    <p className="text-xs text-gray-400 mt-1">{formatNotificationTime(notification.createdAt)}</p>
+                <div key={notification.id} className="px-4 py-3 hover:bg-muted/50 cursor-pointer border-b border-gray-100 last:border-0">
+                  <div className="flex items-start" onClick={() => handleMarkAsRead(notification.id)}>
+                    <div className={`h-3 w-3 mt-1.5 ${getNotificationTypeIcon(notification.type)} rounded-full shrink-0 mr-3`} />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium mb-1 break-words">{notification.message}</p>
+                      <div className="flex justify-between items-center">
+                        <p className="text-xs text-gray-400">{formatNotificationTime(notification.createdAt)}</p>
+                        {!notification.isRead && (
+                          <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">Nuovo</span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </DropdownMenuItem>
+                </div>
               ))
             )}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="p-2 justify-center">
-              <span className="text-sm text-primary">Vedi tutte le notifiche</span>
-            </DropdownMenuItem>
+            <div className="p-3 text-center">
+              <Win11Button variant="outline" size="sm">
+                <span className="text-sm">Visualizza cronologia completa</span>
+              </Win11Button>
+            </div>
           </DropdownMenuContent>
         </DropdownMenu>
         
