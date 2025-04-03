@@ -55,7 +55,6 @@ export function Header({ onSidebarToggle }: HeaderProps) {
                 title: "Sincronizzazione",
                 description: "Database sincronizzato con successo",
               });
-              // Non abbiamo più bisogno di aggiornare le notifiche
             }, 1000);
           }}
           className="mr-1"

@@ -90,19 +90,9 @@ export class DatabaseStorage implements IStorage {
       req.requestCode.startsWith(requestPrefix)
     );
     
-    // Determiniamo il prossimo numero sequenziale
-    let nextSequence = 1; // Iniziamo da 1 se non ci sono richieste oggi
-    if (todayRequests.length > 0) {
-      // Estraiamo i numeri di sequenza dalle richieste esistenti
-      const sequences = todayRequests.map(req => {
-        const parts = req.requestCode.split('-');
-        const seqPart = parts[parts.length - 1];
-        return parseInt(seqPart, 10);
-      });
-      
-      // Troviamo il numero più alto e aggiungiamo 1
-      nextSequence = Math.max(...sequences) + 1;
-    }
+    // Azzeriamo sempre il contatore (iniziamo da 1 per ogni nuova richiesta)
+    // Questo rende il codice semplicemente progressivo
+    const nextSequence = 1;
     
     // Formattiamo il numero sequenziale con zeri iniziali (001, 002, ecc.)
     const sequenceFormatted = nextSequence.toString().padStart(3, '0');
