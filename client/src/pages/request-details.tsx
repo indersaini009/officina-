@@ -277,6 +277,12 @@ export default function RequestDetails() {
                           : 'Avviata lavorazione'}
                       </p>
                       <p className="text-sm text-muted-foreground mt-1">{formatDateTime(request.updatedAt)}</p>
+                      {request.plannedDate && (
+                        <p className="text-sm text-orange-500 mt-1 flex items-center">
+                          <Clock className="h-4 w-4 mr-1" />
+                          Completamento previsto: {formatDate(request.plannedDate)}
+                        </p>
+                      )}
                     </div>
                   </div>
                 )}
